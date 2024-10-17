@@ -10,6 +10,7 @@ import com.example.currency.exchange.webclient.CurrencyExchangeClient;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -30,10 +31,15 @@ public class BillCalculationHandler {
 
         // Step 2: Fetch Currency Exchange Rates
         Map<String, BigDecimal> rates = exchangeClient.getExchangeRates(request.getOriginalCurrency());
-        BigDecimal exchangeRate = rates.get(request.getTargetCurrency());
+        Optional<BigDecimal> exchangeRate = Optional.ofNullable(rates.get(request.getTargetCurrency()));
+        if (!exchangeRate.isPresent()) {
+            log.error("Exchange rate for target currency {} not found.", request.getTargetCurrency());
+            throw new IllegalArgumentException(
+                    "Exchange rate for target currency " + request.getTargetCurrency() + " not found.");
+        }
 
         // Step 3: Convert the discounted amount to the target currency
-        BigDecimal payableAmountInTargetCurrency = discountedAmount.multiply(exchangeRate);
+        BigDecimal payableAmountInTargetCurrency = discountedAmount.multiply(exchangeRate.get());
 
         // Step 4: Return the final payable amount
         return payableAmountInTargetCurrency.setScale(2, RoundingMode.HALF_UP);

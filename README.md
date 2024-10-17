@@ -12,11 +12,11 @@ the target currency using real-time exchange rates.
 - Sonarqube server
 
 ### Used Plugins
-
+- Used **ArchUnit** for java architecture unit testing
+- **PiTest** for mutation testing
 - **Spotless** for auto code formatting
 - **Sonarqube** local server for code analysis
 - **Jacoco** for code coverage reports
-- **PiTest** for mutation testing
 - Swagger for API documentation
 - JUnit 5 & Mockito for testing
 
