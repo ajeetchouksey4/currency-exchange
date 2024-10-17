@@ -88,7 +88,9 @@ compileJava {
 
 build {
     dependsOn('pitest')
-    finalizedBy("sonar")
+
+    // when sonar server is running - do un-comment
+    // finalizedBy("sonar")
 }
 
 sonar {
