@@ -1,0 +1,101 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
+    id 'com.diffplug.spotless' version "$spotlessVersion"
+    id 'info.solidsoft.pitest' version "$pitestVersion"
+    id "org.sonarqube" version "5.1.0.4882"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Dependencies
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Swagger
+    implementation "org.springdoc:springdoc-openapi-starter-common:$springDocVersion"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion"
+
+    // Caffeine
+    implementation "com.github.ben-manes.caffeine:$caffeineVersion"
+
+    // Lombok
+    implementation 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    // Test Scope
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation "com.tngtech.archunit:archunit:$archUnitVersion"
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport, jacocoTestCoverageVerification
+}
+pitest {
+    useClasspathFile = true
+    threads = 8
+    timestampedReports = false
+    junit5PluginVersion = "$piTestJunit5PluginVersion"
+    mutationThreshold = 0
+}
+spotless {
+    java {
+        removeUnusedImports()
+        palantirJavaFormat()
+        licenseHeaderFile(rootProject.file('copyright.txt'))
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+compileJava {
+    dependsOn spotlessApply
+}
+
+build {
+    dependsOn('pitest')
+    finalizedBy("sonar")
+}
+
+sonar {
+    properties {
+        property "sonar.projectKey", "currencyapp"
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.token", "squ_a6ebe38104bfc3520401b061bc8cbe7e939d3322"
+        property "sonar.scm.disabled", "true"
+    }
+}

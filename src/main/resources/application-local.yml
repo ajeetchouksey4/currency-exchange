@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: currency-exchange
+
+server:
+  port: 9090
+
+
+discounts:
+  employee: 0.30
+  affiliate: 0.10
+  loyalty: 0.05
+  tenure: 2
+  flat-discount: 5
+  flat-discount-threshold: 100
+
+
+webclient:
+  apis:
+    currencyexchange:
+      baseurl: https://open.er-api.com
+      services:
+        exchange:
+          url: /v6/latest/{currency_type}?apikey={api_key}
+    stockexchage:
+      baseurl: https://openexchangerates.org/
+      services:
+        exchange:
+          url: /api/latest.json?app_id=YOUR_APP_ID
