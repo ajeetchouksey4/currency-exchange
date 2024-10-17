@@ -31,9 +31,6 @@ public class CurrencyValidatorTest {
     @Mock
     private ConstraintValidatorContext.ConstraintViolationBuilder violationBuilder;
 
-    @Mock
-    private ValidateCurrency ValidateCurrency;
-
     private CurrencyValidator validator;
 
     @BeforeEach

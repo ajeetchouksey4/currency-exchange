@@ -68,13 +68,21 @@ public class BillCalculationService {
             discount = nonGroceryTotal.multiply(loyaltyDiscountRate);
         }
 
-        return nonGroceryTotal.subtract(discount);
+        return nonGroceryTotal.subtract(discount).compareTo(BigDecimal.ZERO) < 0
+                ? BigDecimal.ZERO
+                : nonGroceryTotal.subtract(discount);
     }
 
     private BigDecimal applyFlatDiscount(BigDecimal discountedAmount, BigDecimal totalAmount) {
         BigDecimal flatDiscountToApply =
                 totalAmount.divide(flatDiscountThreshold, 0, RoundingMode.FLOOR).multiply(flatDiscount);
 
-        return discountedAmount.subtract(flatDiscountToApply);
+        //        return discountedAmount.subtract(flatDiscountToApply).compareTo(BigDecimal.ZERO) < 0
+        //                ? BigDecimal.ZERO
+        //                : discountedAmount.subtract(flatDiscountToApply);
+
+        BigDecimal finalAmount = totalAmount.subtract(discountedAmount).subtract(flatDiscountToApply);
+
+        return finalAmount.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : finalAmount;
     }
 }

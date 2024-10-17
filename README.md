@@ -27,7 +27,7 @@ the target currency using real-time exchange rates.
 - Convert total to the desired target currency
 - **License**: Placeholder for a license(copyright.txt)
 - Enabled **Spring Cache** for minimize third party calls
-
+- Enabled spring local profile for development
 ### How to Run the Application
 
 1. Clone the repository:
@@ -43,12 +43,49 @@ the target currency using real-time exchange rates.
     ```
 
 3. Run the application:
+      -- used local spring profile
     ```bash
-    ./gradlew bootRun
-   gradle.bat bootRun
+    ./gradlew bootRun --args='--spring.profiles.active=local'
+   gradle.bat bootRun --args='--spring.profiles.active=local'
+
     ```
 
-4. Access the API at `http://localhost:8080/api/calculate`
+## Sample Bill Request
+4. Access the API at `http://localhost:9090/api/calculate`
+
+This is a sample `BillRequest` JSON object for the Bill Calculation Service.
+
+```json
+{
+    "totalAmount": 1500.75,
+    "originalCurrency": "USD",
+    "targetCurrency": "INR",
+    "user": "EMPLOYEE",
+    "tenure": 12,
+    "items": [
+        {
+            "name": "Laptop",
+            "category": "Electronics",
+            "price": 1200.50
+        },
+        {
+            "name": "Headphones",
+            "category": "Accessories",
+            "price": 100.25
+        },
+        {
+            "name": "Mouse",
+            "category": "Accessories",
+            "price": 50.00
+        },
+        {
+            "name": "Sugar",
+            "category": "grocery",
+            "price": 150.00
+        }
+    ]
+}
+```
 
 5. How to Access Reports
    ```bash
