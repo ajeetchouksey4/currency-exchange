@@ -10,11 +10,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BillCalculationService {
@@ -28,9 +26,6 @@ public class BillCalculationService {
     @Value("${discounts.loyalty}")
     private BigDecimal loyaltyDiscountRate;
 
-    @Value("${discounts.tenure}")
-    private Integer tenure;
-
     @Value("${discounts.flat-discount}")
     private BigDecimal flatDiscount;
 
@@ -38,19 +33,17 @@ public class BillCalculationService {
     private BigDecimal flatDiscountThreshold;
 
     public BigDecimal applyDiscounts(BigDecimal totalAmount, UserType userType, List<Item> items, int customerYears) {
-        // Step 1: Exclude percentage-based discounts for groceries
         BigDecimal nonGroceryTotal = calculateNonGroceryTotal(items);
 
-        // Step 2: Apply percentage-based discount (if applicable)
-        BigDecimal discountedAmount = applyPercentageDiscount(nonGroceryTotal, userType, customerYears);
+        BigDecimal discountedNonGroceryAmount = applyPercentageDiscount(nonGroceryTotal, userType, customerYears);
 
-        // Step 3: Apply flat discount based on the total amount
-        discountedAmount = applyFlatDiscount(discountedAmount, totalAmount);
+        BigDecimal finalDiscountedAmount = applyFlatDiscount(discountedNonGroceryAmount, totalAmount);
 
-        return discountedAmount;
+        return finalDiscountedAmount;
     }
 
     private BigDecimal calculateNonGroceryTotal(List<Item> items) {
+        // Filter out groceries and sum up the prices
         return items.stream()
                 .filter(item -> !"grocery".equalsIgnoreCase(item.getCategory()))
                 .map(Item::getPrice)
@@ -68,21 +61,25 @@ public class BillCalculationService {
             discount = nonGroceryTotal.multiply(loyaltyDiscountRate);
         }
 
-        return nonGroceryTotal.subtract(discount).compareTo(BigDecimal.ZERO) < 0
-                ? BigDecimal.ZERO
-                : nonGroceryTotal.subtract(discount);
+        // Apply the percentage discount and return the remaining amount
+        BigDecimal discountedAmount = nonGroceryTotal.subtract(discount);
+        return discountedAmount.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : discountedAmount;
     }
 
     private BigDecimal applyFlatDiscount(BigDecimal discountedAmount, BigDecimal totalAmount) {
+        // Calculate flat discount based on total bill, not just non-groceries
         BigDecimal flatDiscountToApply =
                 totalAmount.divide(flatDiscountThreshold, 0, RoundingMode.FLOOR).multiply(flatDiscount);
 
-        //        return discountedAmount.subtract(flatDiscountToApply).compareTo(BigDecimal.ZERO) < 0
-        //                ? BigDecimal.ZERO
-        //                : discountedAmount.subtract(flatDiscountToApply);
+        // Apply the flat discount on top of the percentage-based discount
+        BigDecimal finalAmount = totalAmount
+                .subtract(
+                        discountedAmount.compareTo(BigDecimal.ZERO) <= 0
+                                ? BigDecimal.ZERO
+                                : totalAmount.subtract(discountedAmount))
+                .subtract(flatDiscountToApply);
 
-        BigDecimal finalAmount = totalAmount.subtract(discountedAmount).subtract(flatDiscountToApply);
-
+        // Ensure the final amount is non-negative
         return finalAmount.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : finalAmount;
     }
 }

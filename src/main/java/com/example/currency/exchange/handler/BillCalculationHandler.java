@@ -41,7 +41,7 @@ public class BillCalculationHandler {
         // Step 3: Convert the discounted amount to the target currency
         BigDecimal payableAmountInTargetCurrency = discountedAmount.multiply(exchangeRate.get());
 
-        // Step 4: Return the final payable amount
+        // Step 4: Return the final payable amount, rounding to 2 decimal places
         return payableAmountInTargetCurrency.setScale(2, RoundingMode.HALF_UP);
     }
 }
