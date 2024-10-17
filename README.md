@@ -26,7 +26,7 @@ the target currency using real-time exchange rates.
 - Apply discounts based on user type and bill amount
 - Convert total to the desired target currency
 - **License**: Placeholder for a license(copyright.txt)
-- Enabled **Spring Cache** for minimize third party calls
+- Enabled **Spring Cache - Caffeine** for minimize third party calls
 - Enabled spring local profile for development
 ### How to Run the Application
 
