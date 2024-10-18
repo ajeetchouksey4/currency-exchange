@@ -28,6 +28,50 @@ the target currency using real-time exchange rates.
 - **License**: Placeholder for a license(copyright.txt)
 - Enabled **Spring Cache - Caffeine** for minimize third party calls
 - Enabled spring local profile for development
+
+### Project Structure
+```bash
+project-root
+│
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── com
+│   │   │       └── example
+|   |   |         └── currency
+|   |   |           └── exchange
+|   |   |             └── config        # Cache, vault, webclient etc configuration
+│   │   │             ├── constants     # Commonly used constanrs
+│   │   │             ├── controller    # REST Controllers for handling HTTP requests
+│   │   │             ├── enums         # Enum
+│   │   │             ├── exception     # Global exception handler
+│   │   │             ├── handler       # Followed Handler layers pattern
+│   │   │             ├── model         # Request/resopnse model
+|   |   |             └── service       # Business Logic
+|   |   |             └── validator     # Custom request validation
+|   |   |             └── webclient     # API calls via webclinet
+│   │   │             └── Application.java  # Main application entry point
+│   │   └── resources
+│   │       ├── application.yml       # Application configurations
+│   │       ├── application-local.yml # Development environment configs
+│   │       ├── banner.txt            # Spring boot application banner
+│   │       └── exchangesecrets.json  # API secret key store here
+│   └── test
+│       └── java
+│           └── com
+│               └── example
+|                   └── architecture      # ArchUnit for Maintaining High Standard Code Architecture Unit Testcases
+│                   ├── controller        # Unit tests for controllers
+│                   ├── handler           # Unit tests for handler
+│                   ├── service           # Unit tests for services
+|
+├── .gitignore                            # Git ignore file
+├── build.gradle                          # Gradle build configuration file
+├── gradle.properties                     # Defined gradle version properties here
+├── README.md                             # SelfHelp project Documentations
+├── copyright.txt                         # Licence header for all project codebase
+```
+
 ### How to Run the Application
 
 1. Clone the repository:
